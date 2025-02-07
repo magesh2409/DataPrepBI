@@ -20,6 +20,31 @@ data=pd.read_csv("C:\\Users\\mages\\Documents\\supermarket.csv")
 columns = data.columns
 n = len(columns)
 
+##Assign Coorect Data Type
+def assign_datatype(df):
+
+    columns = df.columns
+
+    for col in columns:
+        if pd.api.types.is_object_dtype(df[col]):
+            try:
+                df[col] = pd.to_datetime(df[col])
+            except ValueError:
+                try:
+                    df[col] = df[col].astype(float)
+                    if df[col].dropna().apply(float.is_integer).all():
+                        df[col] = df[col].astype(int)
+                except ValueError:
+                    df[col] = df[col].astype(str)
+        
+        elif pd.api.types.is_float_dtype(df[col]):
+            if df[col].dropna().apply(float.is_integer).all():
+                df[col] = df[col].astype(int)
+
+    return df
+
+data = assign_datatype(data)
+
 #compute percentage of missing values in a every row
 def find_missing_percentage(data):
     data["Missing_Percentage"] =  ((data.isnull().sum(axis=1))/n)* 100
@@ -104,6 +129,9 @@ def visualize_columns(data):
             axes[i].set_title(f'Distribution of {column}')
             axes[i].axvline(x=mean, color="red", linestyle="--", linewidth=2)
 
+        elif pd.api.types.is_datetime64_any_dtype(data[column]):
+            continue
+
         elif pd.api.types.is_object_dtype(data[column]): ##Bar chart of Categorical Column
             sns.countplot(x=data[column], ax=axes[i])
             axes[i].set_xlabel(column)
@@ -111,7 +139,9 @@ def visualize_columns(data):
             axes[i].set_title(f'Frequency Plot of {column}')
             axes[i].tick_params(axis='x', rotation=45)
 
+
     plt.tight_layout()
     plt.show()
             
 visualize_columns(data)
+
