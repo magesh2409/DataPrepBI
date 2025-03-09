@@ -20,7 +20,7 @@ data=pd.read_csv("C:\\Users\\mages\\Documents\\supermarket.csv")
 columns = data.columns
 n = len(columns)
 
-##Assign Coorect Data Type
+##Assign Correct Data Type
 def assign_datatype(df):
 
     columns = df.columns
@@ -43,7 +43,6 @@ def assign_datatype(df):
 
     return df
 
-data = assign_datatype(data)
 
 #compute percentage of missing values in a every row
 def find_missing_percentage(data):
@@ -55,7 +54,7 @@ def find_missing_percentage(data):
     data = data.drop(['Missing_Percentage'] , axis=1)
     return data
 
-data = find_missing_percentage(data)
+
 
 
 #check for normal distrbution columns and replace with mean
@@ -72,7 +71,7 @@ def replace_with_mean(data):
                 data[column].fillna(mean,inplace=True)
     return data
 
-data = replace_with_mean(data)
+
 
 
 
@@ -97,7 +96,7 @@ def RandomForest(df):
 
     return df_imputed
 
-data = RandomForest(data)
+
 
 
 ##visualize numerical columns
@@ -142,6 +141,5 @@ def visualize_columns(data):
 
     plt.tight_layout()
     plt.show()
-            
-visualize_columns(data)
+
 
