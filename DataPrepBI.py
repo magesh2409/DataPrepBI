@@ -1,8 +1,6 @@
 ##Necessary Library
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import math
 from scipy.stats import skew,kurtosis
 import seaborn as sns
@@ -14,7 +12,8 @@ from sklearn.impute import IterativeImputer
 
 
 ##user data
-data=pd.read_csv("C:\\Users\\mages\\Documents\\supermarket.csv")
+path = '/Users/magesh/Documents/facilioAI_support_files/supermarket_sales - Sheet1.csv'
+data=pd.read_csv(path)
 
 ##variables
 columns = data.columns
