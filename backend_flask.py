@@ -14,8 +14,6 @@ app.config['UPLOAD_FOLDER'] = data_files
 
 os.makedirs(data_files , exist_ok=True)
 
-
-
 @app.route('/')
 def home_page():
     return 'This is Home Page'
@@ -46,16 +44,18 @@ def clean_file():
     data = find_missing_percentage(data)
     data = replace_with_mean(data)
     data = RandomForest(data)
-    data = visualize_columns(data)
+    visualize_columns(data)
 
 
     #save cleaned file
-    cleaned_file_name = file.filename + '_cleaned'
+    cleaned_file_name = filename.rsplit('.', 1)[0] + '_cleaned.csv'
     cleaned_file_path = os.path.join(app.config['UPLOAD_FOLDER'] , cleaned_file_name)
     data.to_csv(cleaned_file_path , index=False)
-    return {
-        'filename' : cleaned_file_name
-    }
+    return jsonify(
+        {
+            'filename': cleaned_file_name
+        }
+    )
 
 @app.route('/download/<name>')
 def download_file(name):
