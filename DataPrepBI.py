@@ -4,20 +4,15 @@ import numpy as np
 import math
 from scipy.stats import skew,kurtosis
 import seaborn as sns
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
+import os
 
 
-##user data
-path = '/Users/magesh/Documents/facilioAI_support_files/supermarket_sales - Sheet1.csv'
-data=pd.read_csv(path)
-
-##variables
-columns = data.columns
-n = len(columns)
 
 ##Assign Correct Data Type
 def assign_datatype(df):
@@ -45,6 +40,7 @@ def assign_datatype(df):
 
 #compute percentage of missing values in a every row
 def find_missing_percentage(data):
+    n = data.shape[1]
     data["Missing_Percentage"] =  ((data.isnull().sum(axis=1))/n)* 100
 
 
@@ -56,8 +52,9 @@ def find_missing_percentage(data):
 
 
 
-#check for normal distrbution columns and replace with mean
+#check for normal distribution columns and replace with mean
 def replace_with_mean(data):
+    columns = data.columns
     for column in columns:
         current_column = data[column]
 
@@ -99,46 +96,53 @@ def RandomForest(df):
 
 
 ##visualize numerical columns
+import uuid
+
 def visualize_columns(data):
     df = data.copy()
     columns = df.columns
-    
+
     if len(columns) % 3 == 0:
-        n = len(columns)//3
+        n = len(columns) // 3
     else:
-        n = len(columns)//3
-        n += 1
+        n = len(columns) // 3 + 1
 
     fig, axes = plt.subplots(n, 3, figsize=(15, 6 * n))
     axes = axes.flatten() if n > 1 else [axes]
 
     for i, column in enumerate(columns):
-        if pd.api.types.is_numeric_dtype(data[column]): ##Histogram Chart of Numerical Column
+        if pd.api.types.is_numeric_dtype(data[column]):
             mean = data[column].mean()
             sd = data[column].std() + 1e-6
-
             df[f'Z-Score-of-{column}'] = (df[column] - mean) / sd
             left_max = mean - (5 * sd)
             right_max = mean + (5 * sd)
 
-            sns.histplot(data[column], kde=True, ax=axes[i] , binrange=(left_max , right_max) , bins=10)
+            sns.histplot(data[column], kde=True, ax=axes[i], binrange=(left_max, right_max), bins=10)
+            axes[i].axvline(x=mean, color="red", linestyle="--", linewidth=2)
             axes[i].set_xlabel("Interval of bin size with SD")
             axes[i].set_ylabel("Frequency")
             axes[i].set_title(f'Distribution of {column}')
-            axes[i].axvline(x=mean, color="red", linestyle="--", linewidth=2)
 
         elif pd.api.types.is_datetime64_any_dtype(data[column]):
             continue
 
-        elif pd.api.types.is_object_dtype(data[column]): ##Bar chart of Categorical Column
+        elif pd.api.types.is_object_dtype(data[column]):
             sns.countplot(x=data[column], ax=axes[i])
             axes[i].set_xlabel(column)
             axes[i].set_ylabel("Count")
             axes[i].set_title(f'Frequency Plot of {column}')
             axes[i].tick_params(axis='x', rotation=45)
 
-
     plt.tight_layout()
-    plt.show()
+
+    # Save to file
+    plot_filename = f"plot_{uuid.uuid4().hex}.png"
+    plot_path = os.path.join("data_files", plot_filename)
+    fig.savefig(plot_path)
+    plt.close(fig)
+
+    return plot_filename
+
 
 
